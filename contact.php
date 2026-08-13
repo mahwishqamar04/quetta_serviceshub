@@ -1,6 +1,7 @@
 <?php
 // ==================== Contact Page Logic ====================
-// This page handles the contact form message flow without changing existing behavior.
+// This page is for the public contact form.
+// It reads the form values from POST, checks them, and shows a success or error message.
 $activePage = 'contact';
 include 'config.php';
 
@@ -8,7 +9,8 @@ $message = '';
 $messageType = '';
 
 // ==================== Contact Form Handling ====================
-// Validate the submitted contact details and show a simple success or error response.
+// This block reads all contact form fields from the request.
+// If all required fields are filled, the page shows a success message.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = trim($_POST['first_name'] ?? '');
     $lastName = trim($_POST['last_name'] ?? '');
@@ -476,6 +478,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <a href="#" class="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
 
     <script>
+        // This jQuery code validates the contact form before it is submitted.
+        // It prevents empty or invalid input from being sent to the server.
         $(function () {
             $('.needs-validation').on('submit', function (event) {
                 if (!this.checkValidity()) {

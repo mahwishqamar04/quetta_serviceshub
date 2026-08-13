@@ -1,10 +1,13 @@
 <?php
 // ==================== Admin Dashboard Logic ====================
-// This page protects the dashboard and handles service and booking management.
+// This page is the main dashboard for admins.
+// It checks whether the user is logged in before showing management features.
 $activePage = 'dashboard';
 session_start();
 include 'config.php';
 
+// If the admin is not logged in, redirect them back to the login page.
+// This protects the admin dashboard from public access.
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: admin_login.php');
     exit;
@@ -19,7 +22,8 @@ $message = '';
 $messageType = '';
 
 // ==================== Add Service ====================
-// Create a new service entry and optionally upload an image.
+// This block handles the "Add Service" form in the dashboard.
+// It reads the values from the form, uploads the image if one is selected, and inserts a new service into the services table.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_service') {
     $name = trim($_POST['name'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -59,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 // ==================== Delete Service ====================
-// Remove an existing service using its ID.
+// This block deletes a service by its ID from the database.
+// It is triggered when an admin clicks the Delete button in the dashboard table.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_service') {
     $serviceId = isset($_POST['service_id']) ? (int)$_POST['service_id'] : 0;
 
@@ -80,7 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 // ==================== Fetch Services and Bookings ====================
-// Load the services catalog and recent bookings for the dashboard view.
+// The dashboard reads services and recent bookings from the database.
+// These values are used to show counts and tables on the admin screen.
 $services = [];
 if ($conn) {
     $tableCheck = $conn->query("SHOW TABLES LIKE 'services'");
@@ -118,7 +124,7 @@ if ($conn) {
 }
 
 // ==================== Logout ====================
-// Destroy the admin session and redirect back to the login page.
+// This block ends the admin session and sends the user back to the login page.
 if (isset($_POST['logout'])) {
     session_destroy();
     header('Location: admin_login.php');
@@ -370,6 +376,8 @@ if (isset($_POST['logout'])) {
 
     <!-- ==================== Dashboard Search Script ==================== -->
     <script>
+        // This JavaScript filters the service table while the admin types in the search box.
+        // It keeps the dashboard easier to use when many services are listed.
         const searchInput = document.getElementById('serviceSearch');
         const serviceTable = document.getElementById('serviceTable');
 

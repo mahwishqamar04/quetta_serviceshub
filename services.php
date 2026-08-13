@@ -1,9 +1,12 @@
 <?php
 // ==================== Services Page Logic ====================
-// This page loads the available services and keeps the existing backend flow unchanged.
+// This page shows the full services catalog for visitors.
+// It reads the services table and prepares the data for the layout below.
 $activePage = 'services';
 include 'config.php';
 
+// This helper tries several possible field names and returns the first valid value.
+// This makes the page more flexible if the database column names change slightly.
 function resolveField(array $row, array $candidates) {
     foreach ($candidates as $candidate) {
         if (array_key_exists($candidate, $row) && $row[$candidate] !== null && $row[$candidate] !== '') {
@@ -26,6 +29,8 @@ function resolveImagePath($value) {
     return $value;
 }
 
+// This helper picks a Bootstrap icon class based on the service type.
+// It helps the UI look nicer without changing the actual data stored in the database.
 function resolveIconClass(array $row) {
     $candidates = ['category', 'service_category', 'category_name', 'service_type', 'type', 'icon', 'category_icon', 'service_icon'];
 
@@ -62,7 +67,8 @@ function resolveIconClass(array $row) {
 }
 
 // ==================== Fetch Services ====================
-// Retrieve services from the database for display on the services catalog page.
+// Read all records from the services table and save them in a simple array.
+// Each row is then used to display one service card in the catalog.
 $services = [];
 
 if ($conn) {

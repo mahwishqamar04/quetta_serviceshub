@@ -1,10 +1,12 @@
 <?php
 // ==================== Edit Service Logic ====================
-// This page loads a service for editing and updates it safely.
+// This page loads one service from the database so the admin can update its details.
 $activePage = 'edit';
 session_start();
 include 'config.php';
 
+// Check whether the admin is logged in before showing the edit form.
+// If not, redirect to the login page for security.
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: admin_login.php');
     exit;
@@ -15,7 +17,8 @@ $message = '';
 $messageType = '';
 
 // ==================== Load Service for Editing ====================
-// Retrieve the selected service by ID before showing the edit form.
+// Read the selected service from the URL using its ID.
+// The result is then used to pre-fill the form with the current values.
 $service = null;
 if ($serviceId > 0 && $conn) {
     $stmt = $conn->prepare('SELECT id, name, description, price, image FROM services WHERE id = ? LIMIT 1');
@@ -29,7 +32,7 @@ if ($serviceId > 0 && $conn) {
 }
 
 // ==================== Update Service ====================
-// Save the edited service details using a prepared statement.
+// This block reads the edited values from the form and updates the matching service row in the database.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $serviceId = isset($_POST['service_id']) ? (int)$_POST['service_id'] : 0;
     $name = trim($_POST['name'] ?? '');

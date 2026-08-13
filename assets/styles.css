@@ -1,4 +1,6 @@
 /* ==================== Global Styles ==================== */
+/* This section sets the main colors, spacing values, and fonts used across the whole website.
+   Developers can change the website theme here without editing each page individually. */
 :root {
   --primary: #0B1F3A;
   --secondary: #0D6EFD;
@@ -78,6 +80,8 @@ img { max-width: 100%; }
 }
 
 /* ==================== Navbar Styles ==================== */
+/* This block styles the top navigation bar used on most pages.
+   It controls the brand, menu links, buttons, and mobile menu behavior. */
 .navbar-custom {
   position: sticky;
   top: 0;
@@ -364,6 +368,8 @@ img { max-width: 100%; }
 }
 
 /* ==================== Footer Styles ==================== */
+/* This section styles the footer area at the bottom of each page.
+   It controls colors, spacing, social links, and contact information. */
 .footer-premium {
   margin-top: 40px;
   background: linear-gradient(135deg, var(--primary) 0%, #071d34 100%);
@@ -426,6 +432,9 @@ img { max-width: 100%; }
   color: var(--white);
 }
 
+/* ==================== Admin Dashboard Styles ==================== */
+/* This block styles the admin area of the website.
+   It gives the dashboard a different layout and makes tables, cards, and navigation easier to manage. */
 body.admin-dashboard-body {
   background: linear-gradient(135deg, #f5f9ff 0%, #eef4ff 100%);
   min-height: 100vh;
@@ -648,6 +657,8 @@ body.admin-dashboard-body {
 }
 
 /* ==================== Responsive Styles ==================== */
+/* These media queries help the layout adapt to tablets and phones.
+   They keep the website readable and easy to use on smaller screens. */
 @media (max-width: 1200px) {
   .admin-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

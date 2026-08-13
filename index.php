@@ -1,9 +1,12 @@
 <?php
 // ==================== Home Page Logic ====================
-// Load the shared database connection and fetch services for the homepage.
+// This is the public homepage of the website.
+// It loads the database connection and fetches services to display on the main screen.
 $activePage = 'home';
 include 'config.php';
 
+// This helper looks for a value in a row using several possible column names.
+// It helps the page work even if the database column names are slightly different.
 function resolveField(array $row, array $candidates) {
     foreach ($candidates as $candidate) {
         if (array_key_exists($candidate, $row) && $row[$candidate] !== null && $row[$candidate] !== '') {
@@ -27,7 +30,8 @@ function resolveImagePath($value) {
 }
 
 // ==================== Fetch Services ====================
-// Retrieve services from the database and prepare them for display on the homepage.
+// This section checks the services table and reads all service records.
+// The results are saved in an array so the homepage can loop through them and show cards.
 $services = [];
 
 if ($conn) {

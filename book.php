@@ -1,9 +1,12 @@
 <?php
 // ==================== Booking Page Logic ====================
-// This page receives the selected service ID and prepares the booking form.
+// This page prepares the booking form and saves customer requests.
+// It reads the selected service from the URL and uses the database to fill the form details.
 $activePage = 'book';
 include 'config.php';
 
+// This helper finds the correct value in a database row.
+// It is useful because some service tables may use slightly different column names.
 function resolveServiceField(array $row, array $candidates) {
     foreach ($candidates as $candidate) {
         if (array_key_exists($candidate, $row) && $row[$candidate] !== null && $row[$candidate] !== '') {
@@ -26,6 +29,8 @@ function resolveImagePath($value) {
     return $value;
 }
 
+// Get the service ID from the URL when a user clicks "Book Now" from a service card.
+// This value is used to display the chosen service before the booking form is sent.
 $service_id = isset($_GET['service_id']) ? (int)$_GET['service_id'] : 0;
 $message = '';
 $messageType = '';
@@ -59,6 +64,8 @@ if ($conn) {
     }
 }
 
+// If a service ID was passed in the URL, fetch that service from the database.
+// The data is then shown in the booking form so the user can confirm it before submitting.
 if ($service_id > 0 && $conn) {
     $stmt = $conn->prepare('SELECT * FROM services WHERE ' . $serviceKeyColumn . ' = ? LIMIT 1');
     $stmt->bind_param('i', $service_id);
@@ -103,7 +110,8 @@ if ($conn) {
 }
 
 // ==================== Booking Submission ====================
-// Save the booking after validating the form fields and the selected service.
+// When the user submits the booking form, this block reads the POST values.
+// It validates the fields and then saves the booking information into the bookings table.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $service_id = isset($_POST['service_id']) ? (int)$_POST['service_id'] : 0;
     $name = trim($_POST['name'] ?? '');

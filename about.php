@@ -1,6 +1,7 @@
 <?php
 // About page for Quetta Services Hub
-// This page is isolated and does not alter existing functionality.
+// This page is a simple public information page.
+// It loads the shared database connection and shows the about content without changing the app logic.
 $activePage = 'about';
 include 'config.php';
 ?>

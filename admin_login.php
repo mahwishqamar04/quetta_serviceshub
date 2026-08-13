@@ -1,6 +1,7 @@
 <?php
 // ==================== Admin Authentication ====================
-// This page starts the session and checks the admin login details.
+// This page handles the admin login form.
+// It starts a session, checks the entered username and password, and allows access to the dashboard.
 $activePage = 'login';
 session_start();
 include 'config.php';
@@ -9,7 +10,8 @@ $message = '';
 $messageType = '';
 
 // ==================== Login Form Handling ====================
-// Validate the submitted admin credentials and start the session on success.
+// This block reads the username and password from the login form.
+// If the credentials are valid, a session is created so the admin can access protected pages.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
