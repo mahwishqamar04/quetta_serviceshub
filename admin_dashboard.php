@@ -13,6 +13,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+// This folder is used to store uploaded service images for the dashboard.
+// If the directory does not exist, the code creates it automatically.
 $uploadDir = __DIR__ . '/images';
 if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0777, true);

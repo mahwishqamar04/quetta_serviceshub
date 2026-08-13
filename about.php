@@ -1,7 +1,7 @@
 <?php
-// About page for Quetta Services Hub
-// This page is a simple public information page.
-// It loads the shared database connection and shows the about content without changing the app logic.
+// ==================== About Page Setup ====================
+// This page is the About Us page for the public website.
+// It loads the shared database connection and prepares the page content without changing the app logic.
 $activePage = 'about';
 include 'config.php';
 ?>
@@ -153,6 +153,7 @@ include 'config.php';
 </head>
 <body>
     <!-- ==================== Header / Navigation ==================== -->
+    <!-- This is the top navigation bar used across the website. -->
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark navbar-custom" aria-label="Primary navigation">
             <div class="container-fluid px-3 px-lg-4">
@@ -181,9 +182,12 @@ include 'config.php';
         </nav>
     </header>
 
+    <!-- ==================== Main Page Content ==================== -->
+    <!-- This is the main content area for the About page. -->
     <main class="page-shell about-page">
         <div class="page-card page-card--soft page-shell-card">
             <!-- ==================== Hero Section ==================== -->
+            <!-- This top section introduces the company and explains the main idea of the business. -->
             <section class="hero-panel hero-section fade-in-section hero-panel--spaced">
                 <div class="row align-items-center g-4">
                     <div class="col-lg-7">
@@ -216,6 +220,8 @@ include 'config.php';
                 </div>
             </section>
 
+            <!-- ==================== About Intro Content ==================== -->
+            <!-- This section shows a larger image and a short company description. -->
             <section class="section-block fade-in-section">
                 <div class="row g-4 align-items-center">
                     <div class="col-12 col-lg-6">
@@ -247,6 +253,8 @@ include 'config.php';
                 </div>
             </section>
 
+            <!-- ==================== Vision Section ==================== -->
+            <!-- This section shares the future direction and long-term goal of the company. -->
             <section class="section-block fade-in-section">
                 <div class="about-card">
                     <div class="text-center mb-4">
@@ -257,6 +265,8 @@ include 'config.php';
                 </div>
             </section>
 
+            <!-- ==================== Why Choose Us Section ==================== -->
+            <!-- This section highlights the value and trust the company offers to customers. -->
             <section class="section-block fade-in-section">
                 <div class="section-title">Why Choose Us</div>
                 <p class="section-subtitle">A professional experience designed around convenience, trust and dependable support.</p>
@@ -358,6 +368,8 @@ include 'config.php';
                 </div>
             </section>
 
+            <!-- ==================== How It Works Section ==================== -->
+            <!-- This section explains the simple steps a customer follows when using the service. -->
             <section class="section-block fade-in-section">
                 <div class="section-title">How It Works</div>
                 <p class="section-subtitle">A simple four-step process from discovery to service completion.</p>
@@ -393,6 +405,8 @@ include 'config.php';
                 </div>
             </section>
 
+            <!-- ==================== Call to Action Section ==================== -->
+            <!-- This final banner invites users to explore services and start booking. -->
             <section class="section-block fade-in-section">
                 <div class="cta-panel text-center">
                     <h3 class="mb-3">Ready to Get Started?</h3>
@@ -403,6 +417,8 @@ include 'config.php';
         </div>
     </main>
 
+    <!-- ==================== Footer ==================== -->
+    <!-- This footer shows quick links, service categories, and business contact information. -->
     <footer class="footer-premium" role="contentinfo">
         <div class="container">
             <div class="row g-4">

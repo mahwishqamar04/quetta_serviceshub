@@ -17,6 +17,8 @@ function resolveField(array $row, array $candidates) {
     return '';
 }
 
+// This helper checks whether the image field is empty and returns a default image.
+// This helps the services page display a placeholder instead of a broken image link.
 function resolveImagePath($value) {
     if (empty($value)) {
         return 'https://via.placeholder.com/900x600?text=Quetta+Service';

@@ -17,6 +17,8 @@ function resolveServiceField(array $row, array $candidates) {
     return '';
 }
 
+// This helper makes sure the booking page always has an image to display.
+// If the service image is missing, it uses a placeholder image instead.
 function resolveImagePath($value) {
     if (empty($value)) {
         return 'https://via.placeholder.com/900x600?text=Quetta+Service';

@@ -1,12 +1,12 @@
 <?php
 // ==================== Home Page Logic ====================
-// This is the public homepage of the website.
-// It loads the database connection and fetches services to display on the main screen.
+// This is the main public homepage of the website.
+// It loads the shared database connection and fetches service data to show on the home screen.
 $activePage = 'home';
 include 'config.php';
 
-// This helper looks for a value in a row using several possible column names.
-// It helps the page work even if the database column names are slightly different.
+// This helper checks a database row for the first matching field name.
+// It is useful when column names are not always exactly the same.
 function resolveField(array $row, array $candidates) {
     foreach ($candidates as $candidate) {
         if (array_key_exists($candidate, $row) && $row[$candidate] !== null && $row[$candidate] !== '') {
@@ -17,6 +17,8 @@ function resolveField(array $row, array $candidates) {
     return '';
 }
 
+// This helper gives a default image URL if the service image is missing.
+// It helps the page keep a clean layout even when no image is stored in the database.
 function resolveImagePath($value) {
     if (empty($value)) {
         return 'https://via.placeholder.com/600x360?text=Quetta+Service';
@@ -30,8 +32,8 @@ function resolveImagePath($value) {
 }
 
 // ==================== Fetch Services ====================
-// This section checks the services table and reads all service records.
-// The results are saved in an array so the homepage can loop through them and show cards.
+// This section checks whether the services table exists and reads all service records.
+// The records are saved into an array so the HTML can loop through them and show them as cards.
 $services = [];
 
 if ($conn) {
@@ -47,18 +49,22 @@ if ($conn) {
             }
         }
 
+        // Run a MySQL query to get all services from the database.
+        // The newest services are shown first because the query orders by id descending.
         $query = 'SELECT * FROM services ORDER BY id DESC';
         $result = $conn->query($query);
 
         if ($result) {
+            // Loop through each service row and store only the fields needed for the homepage.
             while ($row = $result->fetch_assoc()) {
-$services[] = [
-    'id' => resolveField($row, ['id']),
-    'image' => resolveField($row, ['image', 'service_image', 'img', 'photo', 'thumbnail', 'service_photo']),
-    'name' => resolveField($row, ['name', 'title', 'service_name', 'service_title', 'service_type']),
-    'description' => resolveField($row, ['description', 'details', 'service_description', 'short_description', 'summary']),
-    'price' => resolveField($row, ['price', 'service_price', 'cost', 'amount']),
-];            }
+                $services[] = [
+                    'id' => resolveField($row, ['id']),
+                    'image' => resolveField($row, ['image', 'service_image', 'img', 'photo', 'thumbnail', 'service_photo']),
+                    'name' => resolveField($row, ['name', 'title', 'service_name', 'service_title', 'service_type']),
+                    'description' => resolveField($row, ['description', 'details', 'service_description', 'short_description', 'summary']),
+                    'price' => resolveField($row, ['price', 'service_price', 'cost', 'amount']),
+                ];
+            }
         }
     }
 }
@@ -80,6 +86,7 @@ $services[] = [
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+    <!-- ==================== Header / Navigation ==================== -->
     <header>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom" aria-label="Primary navigation">
         <div class="container-fluid px-3 px-lg-4">
@@ -108,6 +115,7 @@ $services[] = [
     </header>
 
     <!-- ==================== Hero Section ==================== -->
+    <!-- This is the main welcome area shown at the top of the homepage. -->
     <main class="page-shell">
         <div class="page-card page-card--soft page-shell-card">
             <section class="hero-panel hero-section fade-in-section hero-panel--spaced">
@@ -156,6 +164,7 @@ $services[] = [
             </section>
 
             <!-- ==================== Services Section ==================== -->
+            <!-- This section loops through the services array and displays each service as a card. -->
             <section class="section-block fade-in-section" id="services">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <div>
@@ -166,6 +175,7 @@ $services[] = [
                 </div>
 
                 <?php if (!empty($services)) : ?>
+                    <!-- If services exist, show them in Bootstrap cards. -->
                     <div class="row g-4">
                         <?php foreach ($services as $service) : ?>
                             <div class="col-12 col-md-6 col-xl-4">
@@ -185,6 +195,7 @@ $services[] = [
                         <?php endforeach; ?>
                     </div>
                 <?php else : ?>
+                    <!-- If no services are in the database, show a friendly empty state. -->
                     <div class="empty-state">
                         <p class="mb-0">No services are available right now.</p>
                     </div>
@@ -303,6 +314,8 @@ $services[] = [
         </div>
     </main>
 
+    <!-- ==================== Footer ==================== -->
+    <!-- This footer appears on every page and gives quick links and contact information. -->
     <footer class="footer-premium" role="contentinfo">
         <div class="container">
             <div class="row g-4">
@@ -354,9 +367,11 @@ $services[] = [
         </div>
     </footer>
 
+    <!-- This button scrolls the page back to the top when clicked. -->
     <a href="#" class="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
 
     <script>
+        // This JavaScript adds a small delay to each section so the homepage animations appear smoothly.
         document.querySelectorAll('.fade-in-section').forEach(function (section, index) {
             section.style.animationDelay = (index * 80) + 'ms';
         });
