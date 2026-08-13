@@ -324,7 +324,7 @@ if ($conn) {
                         <?php foreach ($services as $service) : ?>
                             <div class="col-12 col-md-6 col-xl-4">
                                 <div class="card service-card h-100 border-0 shadow-sm fade-in-section">
-                                    <img src="<?= htmlspecialchars(resolveImagePath($service['image'])) ?>" alt="<?= htmlspecialchars($service['name']) ?>" loading="lazy" decoding="async" style="height:220px; object-fit:cover;">
+                                    <img src="images/<?= htmlspecialchars($service['image']) ?>" alt="<?= htmlspecialchars($service['name']) ?>" loading="lazy" decoding="async">
                                     <div class="service-card__body">
                                         <div class="service-icon"><i class="<?= htmlspecialchars($service['icon']) ?>"></i></div>
                                         <h3 class="service-card__title"><?= htmlspecialchars($service['name']) ?></h3>
