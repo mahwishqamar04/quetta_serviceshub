@@ -125,8 +125,22 @@ if ($conn) {
                             <span class="icon-badge"><i class="fa-solid fa-bolt"></i></span>
                             <span class="hero-badge">Trusted Home Services in Quetta</span>
                         </div>
-                        <h1>Fast, dependable home services for every part of your home.</h1>
-                        <p>From repairs and maintenance to cleaning and booking support, we make it simple to get professional help when you need it most.</p>
+                        <h1>Fast, Dependable Home Services For Your Home.</h1>
+                        <div class="d-flex flex-wrap gap-3 my-4 trust-badges">
+                            <div class="trust-badge">
+                                <i class="fa-solid fa-shield"></i>
+                                <span>Verified Professionals</span>
+                            </div>
+                            <div class="trust-badge">
+                                <i class="fa-solid fa-clock"></i>
+                                <span>24/7 Support</span>
+                            </div>
+                            <div class="trust-badge">
+                                <i class="fa-solid fa-star"></i>
+                                <span>500+ Happy Clients</span>
+                            </div>
+                        </div>
+                        <p>From Repairs and Maintenance to Cleaning and Booking Support, we make it simple to get professional help.</p>
                         <div class="d-flex flex-wrap gap-3 mt-4">
                             <a href="book.php" class="btn btn-primary"><i class="fa-solid fa-calendar-check"></i> Book a Service</a>
                             <a href="#services" class="btn btn-secondary"><i class="fa-solid fa-list-check"></i> Explore Services</a>
@@ -320,40 +334,41 @@ if ($conn) {
         <div class="container">
             <div class="row g-4">
                 <div class="col-12 col-md-6 col-lg-3">
-                    <h5 class="footer-title">Company Information</h5>
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="brand-mark brand-mark--footer"><i class="fa-solid fa-hands-helping"></i></span>
-                        <span class="fw-semibold">Quetta Services Hub</span>
-                    </div>
-                    <p class="mb-2">Quetta Services Hub provides reliable, premium home solutions with professionalism and care.</p>
-                    <div class="social-links mt-3">
-                        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <h5 class="footer-title">About</h5>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="brand-mark brand-mark--footer"><i class="fa-solid fa-hands-helping"></i></span>
+                            <span class="fw-semibold">Quetta Services Hub</span>
+                        </div>
+                        <p class="mb-0">Quetta Services Hub provides reliable, premium home solutions with professionalism and care.</p>
+                        <p class="mb-0">Your trusted partner for all home service needs in Quetta, Balochistan.</p>
                     </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
                     <h5 class="footer-title">Quick Links</h5>
                     <div class="d-flex flex-column">
                         <a class="footer-link" href="index.php"><i class="fa-solid fa-chevron-right"></i> Home</a>
+                        <a class="footer-link" href="about.php"><i class="fa-solid fa-chevron-right"></i> About Us</a>
                         <a class="footer-link" href="book.php"><i class="fa-solid fa-chevron-right"></i> Book Service</a>
-                        <a class="footer-link" href="admin_login.php"><i class="fa-solid fa-chevron-right"></i> Admin Login</a>
+                        <a class="footer-link" href="contact.php"><i class="fa-solid fa-chevron-right"></i> Contact</a>
                     </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-3">
-                    <h5 class="footer-title">Services</h5>
-                    <div class="d-flex flex-column">
-                        <a class="footer-link" href="index.php"><i class="fa-solid fa-screwdriver-wrench"></i> Home Repairs</a>
-                        <a class="footer-link" href="index.php"><i class="fa-solid fa-broom"></i> Cleaning</a>
-                        <a class="footer-link" href="index.php"><i class="fa-solid fa-plug-circle-bolt"></i> Electrical</a>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 col-lg-3">
-                    <h5 class="footer-title">Contact Information</h5>
+                    <h5 class="footer-title">Contact</h5>
                     <div class="footer-contact">
-                        <p><i class="fa-solid fa-envelope"></i> info@quettaserviceshub.com</p>
-                        <p><i class="fa-solid fa-phone"></i> +92 300 1234567</p>
                         <p><i class="fa-solid fa-location-dot"></i> Quetta, Balochistan, Pakistan</p>
+                        <p><i class="fa-solid fa-phone"></i> +92 300 1234567</p>
+                        <p><i class="fa-solid fa-envelope"></i> info@quettaserviceshub.com</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <h5 class="footer-title">Follow Us</h5>
+                    <p class="mb-3">Connect with us on social media</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="Twitter" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
                     </div>
                 </div>
             </div>
@@ -369,6 +384,11 @@ if ($conn) {
 
     <!-- This button scrolls the page back to the top when clicked. -->
     <a href="#" class="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
+
+    <!-- ==================== Floating WhatsApp Button ==================== -->
+    <a href="https://wa.me/923XXXXXXXXXX" class="whatsapp-btn" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" title="Chat with us on WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
 
     <script>
         // This JavaScript adds a small delay to each section so the homepage animations appear smoothly.
