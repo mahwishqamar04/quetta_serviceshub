@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // ==================== Services Page Logic ====================
 // This page shows the full services catalog for visitors.
 // It reads the services table and prepares the data for the layout below.

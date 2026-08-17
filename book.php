@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // ==================== Booking Page Logic ====================
 // This page prepares the booking form and saves customer requests.
 // It reads the selected service from the URL and uses the database to fill the form details.
@@ -24,13 +24,17 @@ function resolveImagePath($value) {
         return 'https://via.placeholder.com/900x600?text=Quetta+Service';
     }
 
+    // If database already contains a full URL
     if (preg_match('/^https?:\/\//i', $value)) {
         return $value;
     }
 
-    return $value;
-}
+    // Remove unnecessary paths if database contains them
+    $value = basename($value);
 
+    // Images are inside quetta_serviceshub/images/
+    return 'images/' . $value;
+}
 // Get the service ID from the URL when a user clicks "Book Now" from a service card.
 // This value is used to display the chosen service before the booking form is sent.
 $service_id = isset($_GET['service_id']) ? (int)$_GET['service_id'] : 0;
@@ -615,5 +619,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </footer>
 
     <a href="#" class="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
+    <!-- WhatsApp Floating Button -->
+<a href="https://wa.me/923001234567"
+   class="whatsapp-button"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="Chat with us on WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+</a>
 </body>
 </html>

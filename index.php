@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // ==================== Home Page Logic ====================
 // This is the main public homepage of the website.
 // It loads the shared database connection and fetches service data to show on the home screen.
@@ -396,5 +396,13 @@ if ($conn) {
             section.style.animationDelay = (index * 80) + 'ms';
         });
     </script>
-</body>
+<a href="https://wa.me/923001234567?text=Hello%20Quetta%20Services%20Hub%2C%20I%20need%20information%20about%20your%20services."
+   class="whatsapp-float"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="Contact us on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+    
+    </body>
 </html>

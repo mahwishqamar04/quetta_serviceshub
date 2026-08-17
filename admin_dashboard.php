@@ -85,7 +85,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmt->close();
     }
 }
+// ==================== Delete Booking ====================
+// This block allows the admin to delete a customer booking/message.
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['action']) &&
+    $_POST['action'] === 'delete_booking'
+) {
+    $bookingId = isset($_POST['booking_id']) ? (int)$_POST['booking_id'] : 0;
 
+    if ($bookingId > 0) {
+        $stmt = $conn->prepare('DELETE FROM bookings WHERE id = ?');
+        $stmt->bind_param('i', $bookingId);
+
+        if ($stmt->execute()) {
+            $message = 'Booking deleted successfully.';
+            $messageType = 'success';
+        } else {
+            $message = 'Unable to delete booking.';
+            $messageType = 'error';
+        }
+
+        $stmt->close();
+    }
+}
 // ==================== Fetch Services and Bookings ====================
 // The dashboard reads services and recent bookings from the database.
 // These values are used to show counts and tables on the admin screen.
@@ -260,6 +283,7 @@ if (isset($_POST['logout'])) {
                                             <th>Phone</th>
                                             <th>Address</th>
                                             <th>Date</th>
+											<th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -270,6 +294,20 @@ if (isset($_POST['logout'])) {
                                                 <td><?= htmlspecialchars((string)($booking['phone'] ?? '')) ?></td>
                                                 <td><?= htmlspecialchars((string)($booking['address'] ?? '')) ?></td>
                                                 <td><?= htmlspecialchars((string)($booking['date'] ?? '')) ?></td>
+                                                <td>
+    <form method="post" onsubmit="return confirm('Are you sure you want to delete this booking?');">
+        <input type="hidden" name="action" value="delete_booking">
+        <input type="hidden" name="booking_id" value="<?= (int)($booking['id'] ?? 0) ?>">
+
+        <button 
+            class="btn btn-sm btn-outline-danger"
+            type="submit"
+            title="Delete Booking"
+        >
+            <i class="fa-solid fa-trash"></i> Delete
+        </button>
+    </form>
+</td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -348,11 +386,30 @@ if (isset($_POST['logout'])) {
                                         <td><?= htmlspecialchars($service['description']) ?></td>
                                         <td><?= htmlspecialchars($service['price']) ?></td>
                                         <td>
-                                            <?php if (!empty($service['image'])) : ?>
-                                                <img src="<?= htmlspecialchars($service['image']) ?>" alt="<?= htmlspecialchars($service['name']) ?>" loading="lazy" decoding="async">
-                                            <?php else : ?>
-                                                <span class="text-muted">No image</span>
-                                            <?php endif; ?>
+                                            <?php
+$imageFile = trim((string)($service['image'] ?? ''));
+
+if ($imageFile !== '') {
+    // Only keep the filename if database contains images/filename
+    $imageFile = basename($imageFile);
+    $imageSrc = 'images/' . $imageFile;
+
+    // Check whether the image actually exists
+    $imageFullPath = __DIR__ . '/images/' . $imageFile;
+}
+?>
+
+<?php if ($imageFile !== '' && file_exists($imageFullPath)) : ?>
+    <img 
+        src="<?= htmlspecialchars($imageSrc) ?>" 
+        alt="<?= htmlspecialchars($service['name']) ?>" 
+        loading="lazy" 
+        decoding="async"
+        style="width:80px; height:60px; object-fit:cover; border-radius:8px;"
+    >
+<?php else : ?>
+    <span class="text-muted">No image</span>
+<?php endif; ?>
                                         </td>
                                         <td>
                                             <div class="d-flex flex-wrap gap-2">
