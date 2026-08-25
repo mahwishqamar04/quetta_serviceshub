@@ -186,7 +186,9 @@ if (isset($_POST['logout'])) {
 
                 <nav class="d-flex flex-column gap-2">
                     <a class="nav-link active" href="admin_dashboard.php"><i class="fa-solid fa-gauge-high"></i> Overview</a>
-                    <a class="nav-link" href="edit_service.php"><i class="fa-solid fa-pen"></i> Manage Services</a>
+                    <a class="nav-link" href="admin_dashboard.php#serviceTable">
+    <i class="fa-solid fa-pen"></i> Manage Services
+</a>
                     <a class="nav-link" href="book.php"><i class="fa-solid fa-calendar-check"></i> Booking Page</a>
                     <a class="nav-link" href="index.php"><i class="fa-solid fa-house"></i> Public Site</a>
                 </nav>

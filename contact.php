@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // ==================== Contact Page Logic ====================
 // This page is for the public contact form.
 // It reads the form values from POST, checks them, and shows a success or error message.
@@ -19,9 +19,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject = trim($_POST['subject'] ?? '');
     $messageText = trim($_POST['message'] ?? '');
 
-    if ($firstName !== '' && $lastName !== '' && $email !== '' && $phone !== '' && $subject !== '' && $messageText !== '') {
-        $message = 'Thank you for contacting Quetta Services Hub. We have received your message and will get back to you shortly.';
-        $messageType = 'success';
+    if (
+        $firstName !== '' &&
+        $lastName !== '' &&
+        $email !== '' &&
+        $phone !== '' &&
+        $subject !== '' &&
+        $messageText !== ''
+    ) {
+        if ($conn) {
+            $stmt = $conn->prepare(
+                'INSERT INTO contact_messages
+                (first_name, last_name, email, phone, subject, message)
+                VALUES (?, ?, ?, ?, ?, ?)'
+            );
+
+            if ($stmt) {
+                $stmt->bind_param(
+                    'ssssss',
+                    $firstName,
+                    $lastName,
+                    $email,
+                    $phone,
+                    $subject,
+                    $messageText
+                );
+
+                if ($stmt->execute()) {
+                    $message = 'Thank you for contacting Quetta Services Hub. Your message has been received successfully.';
+                    $messageType = 'success';
+                } else {
+                    $message = 'Unable to save your message. Please try again.';
+                    $messageType = 'error';
+                }
+
+                $stmt->close();
+            } else {
+                $message = 'Unable to process your message. Please try again.';
+                $messageType = 'error';
+            }
+        }
     } else {
         $message = 'Please complete all required fields before submitting your message.';
         $messageType = 'error';
