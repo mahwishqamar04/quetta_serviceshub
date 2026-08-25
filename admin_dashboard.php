@@ -85,6 +85,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmt->close();
     }
 }
+// ==================== Delete Contact Message ====================
+// Allows the admin to remove a contact form message.
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['action']) &&
+    $_POST['action'] === 'delete_contact'
+) {
+    $contactId = isset($_POST['contact_id'])
+        ? (int)$_POST['contact_id']
+        : 0;
+
+    if ($contactId > 0) {
+        $stmt = $conn->prepare(
+            'DELETE FROM contact_messages WHERE id = ?'
+        );
+
+        $stmt->bind_param('i', $contactId);
+
+        if ($stmt->execute()) {
+            $message = 'Contact message deleted successfully.';
+            $messageType = 'success';
+        } else {
+            $message = 'Unable to delete contact message.';
+            $messageType = 'error';
+        }
+
+        $stmt->close();
+    }
+}
 // ==================== Delete Booking ====================
 // This block allows the admin to delete a customer booking/message.
 if (
@@ -143,6 +172,26 @@ if ($conn) {
         if ($bookingResult) {
             while ($bookingRow = $bookingResult->fetch_assoc()) {
                 $bookings[] = $bookingRow;
+            }
+        }
+    }
+}
+
+// ==================== Fetch Contact Messages ====================
+// Gets the latest contact form messages for the admin dashboard.
+$contactMessages = [];
+
+if ($conn) {
+    $contactTableCheck = $conn->query("SHOW TABLES LIKE 'contact_messages'");
+
+    if ($contactTableCheck && $contactTableCheck->num_rows > 0) {
+        $contactResult = $conn->query(
+            'SELECT * FROM contact_messages ORDER BY id DESC LIMIT 10'
+        );
+
+        if ($contactResult) {
+            while ($contactRow = $contactResult->fetch_assoc()) {
+                $contactMessages[] = $contactRow;
             }
         }
     }
@@ -244,6 +293,118 @@ if (isset($_POST['logout'])) {
                         </div>
                     </div>
                 </div>
+<section class="admin-card">
+    <div class="card-title">
+        <div>
+            <h4>Contact Messages</h4>
+            <p class="card-subtitle">Messages received from the contact form</p>
+        </div>
+        <span class="badge bg-primary">
+            <?= count($contactMessages) ?> Messages
+        </span>
+    </div>
+
+    <?php if (!empty($contactMessages)) : ?>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php foreach ($contactMessages as $contact) : ?>
+
+                        <tr>
+                            <td>
+                                <?= (int)($contact['id'] ?? 0) ?>
+                            </td>
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    ($contact['first_name'] ?? '') . ' ' .
+                                    ($contact['last_name'] ?? '')
+                                ) ?>
+                            </td>
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    (string)($contact['email'] ?? '')
+                                ) ?>
+                            </td>
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    (string)($contact['phone'] ?? '')
+                                ) ?>
+                            </td>
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    (string)($contact['subject'] ?? '')
+                                ) ?>
+                            </td>
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    (string)($contact['message'] ?? '')
+                                ) ?>
+                            </td>
+
+                            <td>
+                                <?= htmlspecialchars(
+                                    (string)($contact['created_at'] ?? '')
+                                ) ?>
+                            </td>
+
+                            <td>
+                                <form method="post"
+                                      onsubmit="return confirm('Are you sure you want to delete this message?');">
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="delete_contact">
+
+                                    <input type="hidden"
+                                           name="contact_id"
+                                           value="<?= (int)($contact['id'] ?? 0) ?>">
+
+                                    <button
+                                        class="btn btn-sm btn-outline-danger"
+                                        type="submit"
+                                        title="Delete Message">
+
+                                        <i class="fa-solid fa-trash"></i>
+                                        Delete
+
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+    <?php else : ?>
+
+        <div class="empty-state">
+            No contact messages have been received yet.
+        </div>
+
+    <?php endif; ?>
+</section>
                 <div class="col-12 col-sm-6 col-xl-3">
                     <div class="admin-stat-card h-100">
                         <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
@@ -295,7 +456,7 @@ if (isset($_POST['logout'])) {
                                                 <td><?= htmlspecialchars((string)($booking['name'] ?? '')) ?></td>
                                                 <td><?= htmlspecialchars((string)($booking['phone'] ?? '')) ?></td>
                                                 <td><?= htmlspecialchars((string)($booking['address'] ?? '')) ?></td>
-                                                <td><?= htmlspecialchars((string)($booking['date'] ?? '')) ?></td>
+                                                <td><?= htmlspecialchars((string)($booking['booking_date'] ?? '')) ?></td>
                                                 <td>
     <form method="post" onsubmit="return confirm('Are you sure you want to delete this booking?');">
         <input type="hidden" name="action" value="delete_booking">
@@ -420,6 +581,7 @@ if ($imageFile !== '') {
                                                     <input type="hidden" name="action" value="delete_service">
                                                     <input type="hidden" name="service_id" value="<?= (int)$service['id'] ?>">
                                                     <button class="btn btn-sm btn-outline-danger" type="submit"><i class="fa-solid fa-trash"></i> Delete</button>
+
                                                 </form>
                                             </div>
                                         </td>
