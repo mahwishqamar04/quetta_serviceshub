@@ -105,6 +105,7 @@ if ($conn) {
                     <li class="nav-item"><a class="nav-link <?= $activePage === 'home' ? 'active' : '' ?>" href="index.php"><i class="fa-solid fa-house"></i> Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="about.php"><i class="fa-solid fa-users"></i> About Us</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services"><i class="fa-solid fa-list-check"></i> Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="ai_advisor.php"><i class="fa-solid fa-robot"></i> AI Service Advisor</a></li>
                     <li class="nav-item"><a class="nav-link" href="book.php"><i class="fa-solid fa-calendar-check"></i> Book Service</a></li>
                     <li class="nav-item"><a class="nav-link" href="admin_login.php"><i class="fa-solid fa-user-shield"></i> Admin</a></li>
                 </ul>
@@ -350,6 +351,9 @@ if ($conn) {
                         <a class="footer-link" href="index.php"><i class="fa-solid fa-chevron-right"></i> Home</a>
                         <a class="footer-link" href="about.php"><i class="fa-solid fa-chevron-right"></i> About Us</a>
                         <a class="footer-link" href="book.php"><i class="fa-solid fa-chevron-right"></i> Book Service</a>
+                        <a class="footer-link" href="ai_advisor.php">
+    <i class="fa-solid fa-chevron-right"></i> AI Service Advisor
+</a>
                         <a class="footer-link" href="contact.php"><i class="fa-solid fa-chevron-right"></i> Contact</a>
                     </div>
                 </div>
