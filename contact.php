@@ -19,14 +19,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject = trim($_POST['subject'] ?? '');
     $messageText = trim($_POST['message'] ?? '');
 
-    if (
-        $firstName !== '' &&
-        $lastName !== '' &&
-        $email !== '' &&
-        $phone !== '' &&
-        $subject !== '' &&
-        $messageText !== ''
-    ) {
+    // --- Server-side validation ---
+    $validationErrors = [];
+
+    if ($firstName === '' || mb_strlen($firstName) < 2) {
+        $validationErrors[] = 'Please enter your first name (2\u201350 characters).';
+    }
+
+    if ($lastName === '' || mb_strlen($lastName) < 2) {
+        $validationErrors[] = 'Please enter your last name (2\u201350 characters).';
+    }
+
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $validationErrors[] = 'Please enter a valid email address.';
+    }
+
+    if ($phone === '' || !preg_match('/^[0-9+\-\s]{7,20}$/', $phone)) {
+        $validationErrors[] = 'Please enter a valid phone number (7\u201320 digits).';
+    }
+
+    if ($subject === '' || mb_strlen($subject) < 3) {
+        $validationErrors[] = 'Please enter a subject (at least 3 characters).';
+    }
+
+    if ($messageText === '' || mb_strlen($messageText) < 10) {
+        $validationErrors[] = 'Please enter your message (at least 10 characters).';
+    }
+
+    if (empty($validationErrors)) {
         if ($conn) {
             $stmt = $conn->prepare(
                 'INSERT INTO contact_messages
@@ -60,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } else {
-        $message = 'Please complete all required fields before submitting your message.';
+        $message = implode(' ', $validationErrors);
         $messageType = 'error';
     }
 }
@@ -201,6 +221,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: none;
             border-color: rgba(13,110,253,0.2);
         }
+
+        @media (max-width: 768px) {
+            .contact-page .hero-panel {
+                padding: 24px 18px;
+            }
+            .contact-illustration {
+                min-height: 200px;
+                padding: 18px;
+            }
+            .form-card {
+                padding: 20px;
+            }
+            .cta-panel {
+                padding: 24px 18px;
+                border-radius: 20px;
+            }
+            .info-card {
+                padding: 18px;
+            }
+            .why-card {
+                padding: 18px;
+            }
+            .location-card {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .contact-page .hero-panel {
+                padding: 18px 14px;
+            }
+            .contact-illustration {
+                min-height: 160px;
+            }
+            .form-card {
+                padding: 16px;
+            }
+            .cta-panel {
+                padding: 20px 14px;
+            }
+            .cta-panel h3 {
+                font-size: 1.1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -312,45 +376,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p class="section-subtitle">Fill out the form below and our team will get back to you shortly.</p>
 
                             <?php if ($message !== '') : ?>
-                                <div class="alert <?= htmlspecialchars($messageType === 'success' ? 'alert-success' : 'alert-error') ?>">
-                                    <?= htmlspecialchars($message) ?>
+                                <div class="alert <?= htmlspecialchars($messageType === 'success' ? 'alert-success' : 'alert-danger') ?>" role="alert" style="border-radius: 14px; border: none; box-shadow: 0 8px 20px rgba(11,31,58,0.06);">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="fa-solid <?= htmlspecialchars($messageType === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation') ?>"></i>
+                                        <div>
+                                            <div class="fw-semibold"><?= htmlspecialchars($messageType === 'success' ? 'Message sent successfully!' : 'Submission notice') ?></div>
+                                            <div class="small"><?= htmlspecialchars($message) ?></div>
+                                        </div>
+                                    </div>
                                 </div>
                             <?php endif; ?>
 
                             <form method="post" class="needs-validation" novalidate>
                                 <div class="row g-3">
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label" for="first_name"><i class="fa-solid fa-user me-2"></i>First Name</label>
-                                        <input id="first_name" name="first_name" type="text" class="form-control" placeholder="Enter your first name" required>
-                                        <div class="invalid-feedback">Please enter your first name.</div>
+                                        <label class="form-label" for="first_name"><i class="fa-solid fa-user me-2"></i>First Name <span class="text-danger">*</span></label>
+                                        <input id="first_name" name="first_name" type="text" class="form-control" placeholder="e.g. Muhammad" minlength="2" maxlength="50" required>
+                                        <div class="invalid-feedback">Please enter your first name (2–50 characters).</div>
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label" for="last_name"><i class="fa-solid fa-user me-2"></i>Last Name</label>
-                                        <input id="last_name" name="last_name" type="text" class="form-control" placeholder="Enter your last name" required>
-                                        <div class="invalid-feedback">Please enter your last name.</div>
+                                        <label class="form-label" for="last_name"><i class="fa-solid fa-user me-2"></i>Last Name <span class="text-danger">*</span></label>
+                                        <input id="last_name" name="last_name" type="text" class="form-control" placeholder="e.g. Khan" minlength="2" maxlength="50" required>
+                                        <div class="invalid-feedback">Please enter your last name (2–50 characters).</div>
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label" for="email"><i class="fa-solid fa-envelope me-2"></i>Email Address</label>
-                                        <input id="email" name="email" type="email" class="form-control" placeholder="Enter your email" required>
+                                        <label class="form-label" for="email"><i class="fa-solid fa-envelope me-2"></i>Email Address <span class="text-danger">*</span></label>
+                                        <input id="email" name="email" type="email" class="form-control" placeholder="e.g. name@example.com" maxlength="100" required>
                                         <div class="invalid-feedback">Please enter a valid email address.</div>
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label" for="phone"><i class="fa-solid fa-phone me-2"></i>Phone Number</label>
-                                        <input id="phone" name="phone" type="tel" class="form-control" placeholder="Enter your phone number" required>
-                                        <div class="invalid-feedback">Please enter your phone number.</div>
+                                        <label class="form-label" for="phone"><i class="fa-solid fa-phone me-2"></i>Phone Number <span class="text-danger">*</span></label>
+                                        <input id="phone" name="phone" type="tel" class="form-control" placeholder="e.g. 0300-1234567" pattern="^[0-9+\-\s]{7,20}$" maxlength="20" required>
+                                        <div class="invalid-feedback">Please enter a valid phone number (7–20 digits).</div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label" for="subject"><i class="fa-solid fa-tag me-2"></i>Subject</label>
-                                        <input id="subject" name="subject" type="text" class="form-control" placeholder="What do you need help with?" required>
-                                        <div class="invalid-feedback">Please enter a subject.</div>
+                                        <label class="form-label" for="subject"><i class="fa-solid fa-tag me-2"></i>Subject <span class="text-danger">*</span></label>
+                                        <input id="subject" name="subject" type="text" class="form-control" placeholder="What do you need help with?" minlength="3" maxlength="150" required>
+                                        <div class="invalid-feedback">Please enter a subject (at least 3 characters).</div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label" for="message"><i class="fa-solid fa-comment-dots me-2"></i>Message</label>
-                                        <textarea id="message" name="message" class="form-control" rows="5" placeholder="Write your message here" required></textarea>
-                                        <div class="invalid-feedback">Please enter your message.</div>
+                                        <label class="form-label" for="message"><i class="fa-solid fa-comment-dots me-2"></i>Message <span class="text-danger">*</span></label>
+                                        <textarea id="message" name="message" class="form-control" rows="5" placeholder="Write your message here (at least 10 characters)" minlength="10" maxlength="2000" required></textarea>
+                                        <div class="invalid-feedback">Please enter your message (at least 10 characters).</div>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary mt-4" type="submit"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+                                <button class="btn btn-primary mt-4" type="submit"><i class="fa-solid fa-paper-plane me-1"></i> Send Message</button>
                             </form>
                         </div>
                     </div>
@@ -515,17 +585,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <a href="#" class="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
 
     <script>
-        // This jQuery code validates the contact form before it is submitted.
-        // It prevents empty or invalid input from being sent to the server.
-        $(function () {
-            $('.needs-validation').on('submit', function (event) {
-                if (!this.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                $(this).addClass('was-validated');
+        // ==================== Contact Form Validation ====================
+        // Bootstrap custom validation with enhanced feedback
+        (function () {
+            'use strict';
+
+            var forms = document.querySelectorAll('.needs-validation');
+            forms.forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        // Scroll to first invalid field for better UX
+                        var firstInvalid = form.querySelector(':invalid');
+                        if (firstInvalid) {
+                            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                    form.classList.add('was-validated');
+                });
             });
-        });
+
+            // Auto-dismiss success alert after 6 seconds
+            var successAlert = document.querySelector('.alert-success');
+            if (successAlert) {
+                setTimeout(function () {
+                    successAlert.style.transition = 'opacity 0.5s ease';
+                    successAlert.style.opacity = '0';
+                    setTimeout(function () { successAlert.remove(); }, 500);
+                }, 6000);
+            }
+        })();
     </script>
 </body>
 </html>

@@ -149,6 +149,60 @@ include 'config.php';
             color: white;
             box-shadow: 0 20px 45px rgba(11,31,58,0.18);
         }
+
+        @media (max-width: 768px) {
+            .about-page .hero-panel {
+                padding: 24px 18px;
+            }
+            .about-illustration {
+                min-height: 200px;
+                padding: 18px;
+            }
+            .about-image-card img {
+                min-height: 200px;
+            }
+            .cta-panel {
+                padding: 24px 18px;
+                border-radius: 20px;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            .stat-label {
+                font-size: 0.85rem;
+            }
+            .stats-section {
+                padding: 24px 16px;
+                border-radius: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .about-page .hero-panel {
+                padding: 18px 14px;
+            }
+            .about-illustration {
+                min-height: 160px;
+            }
+            .about-image-card img {
+                min-height: 160px;
+            }
+            .about-card {
+                padding: 18px;
+            }
+            .step-card {
+                padding: 18px;
+            }
+            .cta-panel {
+                padding: 20px 14px;
+            }
+            .cta-panel h3 {
+                font-size: 1.1rem;
+            }
+            .stat-value {
+                font-size: 1.3rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -189,32 +243,17 @@ include 'config.php';
             <!-- ==================== Hero Section ==================== -->
             <!-- This top section introduces the company and explains the main idea of the business. -->
             <section class="hero-panel hero-section fade-in-section hero-panel--spaced">
-                <div class="row align-items-center g-4">
-                    <div class="col-lg-7">
-                        <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="row justify-content-center g-4">
+                    <div class="col-lg-10 mx-auto text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
                             <span class="icon-badge"><i class="fa-solid fa-bolt"></i></span>
                             <span class="hero-badge">Trusted Home Service Partner</span>
                         </div>
                         <h1>About Quetta Services Hub</h1>
-                        <p>Trusted home services designed to make everyday life easier. We help customers find dependable solutions for repairs, maintenance, cleaning and professional household support.</p>
-                        <div class="d-flex flex-wrap gap-3 mt-4">
+                        <p class="mx-auto" style="max-width: 720px;">Trusted home services designed to make everyday life easier. We help customers find dependable solutions for repairs, maintenance, cleaning and professional household support.</p>
+                        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
                             <a href="services.php" class="btn btn-primary"><i class="fa-solid fa-list-check"></i> Explore Services</a>
                             <a href="book.php" class="btn btn-secondary"><i class="fa-solid fa-calendar-check"></i> Book a Service</a>
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="about-illustration">
-                            <svg viewBox="0 0 512 420" role="img" aria-label="Illustration of a professional home service team">
-                                <rect x="60" y="90" width="392" height="270" rx="28" fill="#ffffff" opacity="0.96"></rect>
-                                <rect x="100" y="120" width="140" height="120" rx="18" fill="#dfefff"></rect>
-                                <rect x="270" y="120" width="122" height="92" rx="18" fill="#0D6EFD"></rect>
-                                <rect x="100" y="270" width="292" height="56" rx="14" fill="#0B1F3A"></rect>
-                                <circle cx="200" cy="222" r="48" fill="#0D6EFD"></circle>
-                                <circle cx="200" cy="222" r="28" fill="#ffffff"></circle>
-                                <path d="M280 210c16 0 29 13 29 29v34h-58v-34c0-16 13-29 29-29z" fill="#ffffff"></path>
-                                <path d="M262 180h36v24h-36z" fill="#0B1F3A"></path>
-                                <path d="M248 164c0-28 22-50 50-50s50 22 50 50v12h-100v-12z" fill="#0D6EFD"></path>
-                            </svg>
                         </div>
                     </div>
                 </div>

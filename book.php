@@ -125,7 +125,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = trim($_POST['address'] ?? '');
     $bookingDate = trim($_POST['date'] ?? '');
 
-    if ($service_id > 0 && $name !== '' && $phone !== '' && $address !== '' && $bookingDate !== '') {
+    // --- Server-side validation ---
+    $validationErrors = [];
+
+    if ($service_id <= 0) {
+        $validationErrors[] = 'Please select a valid service before booking.';
+    }
+
+    if ($name === '' || mb_strlen($name) < 3) {
+        $validationErrors[] = 'Please enter your full name (at least 3 characters).';
+    }
+
+    if ($phone === '' || !preg_match('/^[0-9+\-\s]{7,20}$/', $phone)) {
+        $validationErrors[] = 'Please enter a valid phone number (7\u201320 digits, may include + or -).';
+    }
+
+    if ($address === '' || mb_strlen($address) < 5) {
+        $validationErrors[] = 'Please enter your address (at least 5 characters).';
+    }
+
+    if ($bookingDate === '') {
+        $validationErrors[] = 'Please choose a preferred date.';
+    } else {
+        // Validate date format and ensure it is not in the past
+        $dateParts = date_parse($bookingDate);
+        if ($dateParts['error_count'] > 0 || !checkdate($dateParts['month'], $dateParts['day'], $dateParts['year'])) {
+            $validationErrors[] = 'Please enter a valid date.';
+        } else {
+            $today = new DateTime();
+            $today->setTime(0, 0, 0);
+            $selected = new DateTime($bookingDate);
+            if ($selected < $today) {
+                $validationErrors[] = 'Please select today or a future date.';
+            }
+        }
+    }
+
+    if (empty($validationErrors)) {
         $stmt = $conn->prepare('INSERT INTO bookings (service_id, name, phone, address, booking_date) VALUES (?, ?, ?, ?, ?)');
         $stmt->bind_param('issss', $service_id, $name, $phone, $address, $bookingDate);
 
@@ -139,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->close();
     } else {
-        $message = $service_id > 0 ? 'Please fill all fields correctly.' : 'Please select a valid service before booking.';
+        $message = implode(' ', $validationErrors);
         $messageType = 'error';
     }
 }
@@ -397,6 +433,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
+            .booking-hero__badge {
+                white-space: normal;
+            }
+
+            .selected-service-card img {
+                height: 200px;
+            }
         }
 
         @media (max-width: 767.98px) {
@@ -411,6 +455,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             .selected-service-card__body {
                 padding: 20px;
+            }
+
+            .selected-service-card img {
+                height: 180px;
+            }
+
+            .booking-hero h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .booking-hero {
+                padding: 18px 14px;
+            }
+
+            .booking-hero h1 {
+                font-size: 1.25rem;
+            }
+
+            .booking-hero p {
+                font-size: 0.9rem;
+            }
+
+            .booking-form-card {
+                padding: 18px 14px;
+            }
+
+            .selected-service-card img {
+                height: 160px;
+            }
+
+            .booking-chip {
+                font-size: 0.78rem;
+                padding: 6px 10px;
             }
         }
     </style>
@@ -517,36 +596,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 <div class="row g-3">
                                     <div class="col-12 col-md-6">
-                                        <label for="name" class="form-label fw-semibold text-dark">Full Name</label>
+                                        <label for="name" class="form-label fw-semibold text-dark">Full Name <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                            <input id="name" name="name" type="text" class="form-control" placeholder="Your full name" required>
+                                            <input id="name" name="name" type="text" class="form-control" placeholder="e.g. Muhammad Ali" minlength="3" maxlength="100" required>
                                         </div>
-                                        <div class="invalid-feedback">Please enter your name.</div>
+                                        <div class="invalid-feedback">Please enter your full name (at least 3 characters).</div>
                                     </div>
 
                                     <div class="col-12 col-md-6">
-                                        <label for="phone" class="form-label fw-semibold text-dark">Phone Number</label>
+                                        <label for="phone" class="form-label fw-semibold text-dark">Phone Number <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                                            <input id="phone" name="phone" type="tel" class="form-control" placeholder="Phone number" required>
+                                            <input id="phone" name="phone" type="tel" class="form-control" placeholder="e.g. 0300-1234567" pattern="^[0-9+\-\s]{7,20}$" maxlength="20" required>
                                         </div>
-                                        <div class="invalid-feedback">Please enter your phone number.</div>
+                                        <div class="invalid-feedback">Please enter a valid phone number (7–20 digits, may include + or -).</div>
                                     </div>
 
                                     <div class="col-12">
-                                        <label for="address" class="form-label fw-semibold text-dark">Address</label>
-                                        <textarea id="address" name="address" class="form-control" placeholder="Your address" required></textarea>
-                                        <div class="invalid-feedback">Please enter your address.</div>
+                                        <label for="address" class="form-label fw-semibold text-dark">Address <span class="text-danger">*</span></label>
+                                        <textarea id="address" name="address" class="form-control" placeholder="Your complete address" minlength="5" maxlength="500" required></textarea>
+                                        <div class="invalid-feedback">Please enter your address (at least 5 characters).</div>
                                     </div>
 
                                     <div class="col-12 col-md-6">
-                                        <label for="date" class="form-label fw-semibold text-dark">Preferred Date</label>
+                                        <label for="date" class="form-label fw-semibold text-dark">Preferred Date <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                                             <input id="date" name="date" type="date" class="form-control" required>
                                         </div>
-                                        <div class="invalid-feedback">Please choose a date.</div>
+                                        <div class="invalid-feedback">Please choose a valid date (today or later).</div>
                                     </div>
                                 </div>
 
@@ -619,6 +698,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </footer>
 
     <a href="#" class="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
+
+    <script>
+    // ==================== Booking Form Validation ====================
+    (function () {
+        'use strict';
+
+        // Set minimum selectable date to today
+        var dateInput = document.getElementById('date');
+        if (dateInput) {
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var dd = String(today.getDate()).padStart(2, '0');
+            dateInput.setAttribute('min', yyyy + '-' + mm + '-' + dd);
+        }
+
+        // Bootstrap custom validation
+        var forms = document.querySelectorAll('.needs-validation');
+        forms.forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                // Extra check: date must not be in the past
+                if (dateInput && dateInput.value) {
+                    var selected = new Date(dateInput.value);
+                    var now = new Date();
+                    now.setHours(0, 0, 0, 0);
+                    if (selected < now) {
+                        dateInput.setCustomValidity('Please select today or a future date.');
+                    } else {
+                        dateInput.setCustomValidity('');
+                    }
+                }
+
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    // Scroll to first invalid field
+                    var firstInvalid = form.querySelector(':invalid');
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+                form.classList.add('was-validated');
+            });
+        });
+
+        // Clear custom validity on date input change
+        if (dateInput) {
+            dateInput.addEventListener('change', function () {
+                this.setCustomValidity('');
+            });
+        }
+
+        // Auto-dismiss success alert after 6 seconds
+        var successAlert = document.querySelector('.alert-success.booking-alert');
+        if (successAlert) {
+            setTimeout(function () {
+                successAlert.style.transition = 'opacity 0.5s ease';
+                successAlert.style.opacity = '0';
+                setTimeout(function () { successAlert.remove(); }, 500);
+            }, 6000);
+        }
+    })();
+    </script>
     <!-- WhatsApp Floating Button -->
 <a href="https://wa.me/923001234567"
    class="whatsapp-button"

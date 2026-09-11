@@ -52,13 +52,13 @@
                     <strong>AI Advisor</strong>
 
                     <p>
-                        Hello! 👋 I'm your Quetta Services Hub
-                        Service Advisor.
+                        Hello! I'm your Quetta Services Hub
+                        Smart Service Advisor.
                     </p>
 
                     <p>
-                        Tell me what problem you are experiencing
-                        at home. For example:
+                        Describe any problem you're facing at home
+                        and I'll recommend the right service for you. For example:
                     </p>
 
                     <div class="example-problems">
@@ -96,6 +96,7 @@
                         class="form-control"
                         placeholder="Describe your home service problem..."
                         autocomplete="off"
+                        maxlength="500"
                         required
                     >
 
@@ -110,10 +111,16 @@
 
                 </div>
 
+                <div class="input-validation-error" id="inputValidationError">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="validationErrorText">Please describe your problem (at least 5 characters).</span>
+                </div>
+
             </form>
 
             <small class="input-help">
-                Example: "My bathroom pipe is leaking."
+                <i class="fa-solid fa-lightbulb"></i>
+                Try: "My bathroom pipe is leaking" or "AC not cooling properly"
             </small>
 
         </div>
@@ -123,7 +130,7 @@
 </div>
 
 <!-- AI Advisor JavaScript -->
-<script src="js/ai-advisor.js?v=2"></script>
+<script src="js/ai-advisor.js?v=4"></script>
 
 </body>
 </html>

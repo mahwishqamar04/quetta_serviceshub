@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
 
         if (in_array($_FILES['image']['type'], $allowedTypes, true) && move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
-            $imagePath = 'images/' . $fileName;
+            $imagePath = $fileName;
         } else {
             $message = 'Image upload failed. Please use a valid image file.';
             $messageType = 'error';
@@ -197,6 +197,30 @@ if ($conn) {
     }
 }
 
+// ==================== Fetch Total Counts for Statistics ====================
+// These counts are used in the stat cards at the top of the dashboard.
+$totalBookingsCount = 0;
+if ($conn) {
+    $bookingCountCheck = $conn->query("SHOW TABLES LIKE 'bookings'");
+    if ($bookingCountCheck && $bookingCountCheck->num_rows > 0) {
+        $countResult = $conn->query('SELECT COUNT(*) AS total FROM bookings');
+        if ($countResult && $countRow = $countResult->fetch_assoc()) {
+            $totalBookingsCount = (int)($countRow['total'] ?? 0);
+        }
+    }
+}
+
+$totalContactCount = 0;
+if ($conn) {
+    $contactCountCheck = $conn->query("SHOW TABLES LIKE 'contact_messages'");
+    if ($contactCountCheck && $contactCountCheck->num_rows > 0) {
+        $contactCountResult = $conn->query('SELECT COUNT(*) AS total FROM contact_messages');
+        if ($contactCountResult && $contactCountRow = $contactCountResult->fetch_assoc()) {
+            $totalContactCount = (int)($contactCountRow['total'] ?? 0);
+        }
+    }
+}
+
 // ==================== Logout ====================
 // This block ends the admin session and sends the user back to the login page.
 if (isset($_POST['logout'])) {
@@ -219,6 +243,256 @@ if (isset($_POST['logout'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        /* ==================== Admin Dashboard Enhancements ==================== */
+
+        /* --- Stat Cards --- */
+        .admin-stat-card {
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid transparent;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .admin-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(10, 35, 66, 0.12);
+        }
+        .admin-stat-card--services  { border-left-color: #0d6efd; }
+        .admin-stat-card--bookings  { border-left-color: #198754; }
+        .admin-stat-card--messages  { border-left-color: #6f42c1; }
+        .admin-stat-card--status    { border-left-color: #f59e0b; }
+
+        .admin-stat-card::after {
+            content: '';
+            position: absolute;
+            top: -24px;
+            right: -24px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(13, 110, 253, 0.04);
+            pointer-events: none;
+        }
+        .admin-stat-card h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.1;
+        }
+        .admin-stat-card p {
+            font-size: 0.84rem;
+            color: var(--muted);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+        }
+
+        /* --- Section Headers --- */
+        .admin-section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            margin-bottom: -4px;
+        }
+        .admin-section-header h5 {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            font-weight: 700;
+            margin: 0;
+        }
+        .admin-section-header hr {
+            flex: 1;
+            margin: 0;
+            border: 0;
+            border-top: 1px solid var(--border);
+        }
+
+        /* --- Admin Card --- */
+        .admin-card .card-title h4 {
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- Empty States --- */
+        .empty-state {
+            padding: 42px 24px;
+            text-align: center;
+        }
+        .empty-state__icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(13,110,253,0.10), rgba(111,66,193,0.08));
+            color: #0d6efd;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        /* --- Tables --- */
+        .admin-table th {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        .admin-table td {
+            padding: 13px 14px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        .admin-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .admin-table tbody tr:hover {
+            background: rgba(13, 110, 253, 0.03);
+        }
+
+        /* --- Action Buttons --- */
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        .admin-table .btn-outline-danger {
+            border-color: rgba(220,53,69,0.25);
+            color: #dc3545;
+        }
+        .admin-table .btn-outline-danger:hover {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+        .admin-table .btn-outline-primary {
+            border-color: rgba(13,110,253,0.25);
+            color: #0d6efd;
+        }
+        .admin-table .btn-outline-primary:hover {
+            background: #0d6efd;
+            border-color: #0d6efd;
+            color: #fff;
+        }
+
+        /* --- Forms --- */
+        .modern-form .form-control {
+            padding: 11px 14px;
+            font-size: 0.93rem;
+        }
+        .modern-form .form-label {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .modern-form .btn-primary {
+            padding: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 14px;
+            letter-spacing: 0.02em;
+        }
+
+        /* --- Service Directory Image Thumbnails --- */
+        .admin-table img {
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        /* --- Alerts --- */
+        .alert-success,
+        .alert-error {
+            border-radius: 14px;
+            font-weight: 600;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+        }
+        .alert-success {
+            background: linear-gradient(135deg, rgba(25,135,84,0.10), rgba(25,135,84,0.05));
+            color: #0f5132;
+        }
+        .alert-error {
+            background: linear-gradient(135deg, rgba(220,53,69,0.10), rgba(220,53,69,0.05));
+            color: #842029;
+        }
+
+        /* --- Sidebar --- */
+        .admin-sidebar .nav-link {
+            font-size: 0.92rem;
+            padding: 10px 14px;
+        }
+
+        /* --- Badge Improvements --- */
+        .badge-count {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 999px;
+            letter-spacing: 0.02em;
+        }
+
+        /* --- Dashboard Footer --- */
+        .admin-footer {
+            text-align: center;
+            padding: 18px 24px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        .admin-footer a {
+            color: var(--secondary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .admin-stat-card h3 {
+                font-size: 1.35rem;
+            }
+            .admin-table td,
+            .admin-table th {
+                padding: 10px 8px;
+                font-size: 0.83rem;
+            }
+            .admin-card {
+                padding: 16px;
+            }
+            .admin-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 16px 18px;
+            }
+            .admin-topbar .search-wrap {
+                min-width: 100%;
+            }
+            .empty-state {
+                padding: 28px 16px;
+            }
+        }
+    </style>
 </head>
 <body class="admin-dashboard-body">
     <div class="admin-dashboard-shell" role="main">
@@ -270,14 +544,18 @@ if (isset($_POST['logout'])) {
 
             <?php if ($message !== '') : ?>
                 <div class="alert <?= htmlspecialchars($messageType === 'success' ? 'alert-success' : 'alert-error') ?>">
+                    <i class="fa-solid <?= $messageType === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation' ?>"></i>
                     <?= htmlspecialchars($message) ?>
                 </div>
             <?php endif; ?>
 
+            <!-- ==================== Statistics Cards ==================== -->
             <section class="row g-3">
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="admin-stat-card h-100">
-                        <div class="stat-icon"><i class="fa-solid fa-list-check"></i></div>
+                    <div class="admin-stat-card admin-stat-card--services h-100">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(13,110,253,0.16), rgba(13,110,253,0.08));">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
                         <div>
                             <h3><?= count($services) ?></h3>
                             <p>Total Services</p>
@@ -285,155 +563,55 @@ if (isset($_POST['logout'])) {
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="admin-stat-card h-100">
-                        <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="admin-stat-card admin-stat-card--bookings h-100">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(25,135,84,0.16), rgba(25,135,84,0.08));">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
                         <div>
-                            <h3><?= count($bookings) ?></h3>
-                            <p>Recent Bookings</p>
+                            <h3><?= $totalBookingsCount ?></h3>
+                            <p>Total Bookings</p>
                         </div>
                     </div>
                 </div>
-<section class="admin-card">
-    <div class="card-title">
-        <div>
-            <h4>Contact Messages</h4>
-            <p class="card-subtitle">Messages received from the contact form</p>
-        </div>
-        <span class="badge bg-primary">
-            <?= count($contactMessages) ?> Messages
-        </span>
-    </div>
-
-    <?php if (!empty($contactMessages)) : ?>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle admin-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Subject</th>
-                        <th>Message</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <?php foreach ($contactMessages as $contact) : ?>
-
-                        <tr>
-                            <td>
-                                <?= (int)($contact['id'] ?? 0) ?>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    ($contact['first_name'] ?? '') . ' ' .
-                                    ($contact['last_name'] ?? '')
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    (string)($contact['email'] ?? '')
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    (string)($contact['phone'] ?? '')
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    (string)($contact['subject'] ?? '')
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    (string)($contact['message'] ?? '')
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <?= htmlspecialchars(
-                                    (string)($contact['created_at'] ?? '')
-                                ) ?>
-                            </td>
-
-                            <td>
-                                <form method="post"
-                                      onsubmit="return confirm('Are you sure you want to delete this message?');">
-
-                                    <input type="hidden"
-                                           name="action"
-                                           value="delete_contact">
-
-                                    <input type="hidden"
-                                           name="contact_id"
-                                           value="<?= (int)($contact['id'] ?? 0) ?>">
-
-                                    <button
-                                        class="btn btn-sm btn-outline-danger"
-                                        type="submit"
-                                        title="Delete Message">
-
-                                        <i class="fa-solid fa-trash"></i>
-                                        Delete
-
-                                    </button>
-                                </form>
-                            </td>
-
-                        </tr>
-
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-
-    <?php else : ?>
-
-        <div class="empty-state">
-            No contact messages have been received yet.
-        </div>
-
-    <?php endif; ?>
-</section>
                 <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="admin-stat-card h-100">
-                        <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+                    <div class="admin-stat-card admin-stat-card--messages h-100">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(111,66,193,0.16), rgba(111,66,193,0.08));">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h3><?= $totalContactCount ?></h3>
+                            <p>Contact Messages</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="admin-stat-card admin-stat-card--status h-100">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(245,158,11,0.16), rgba(245,158,11,0.08));">
+                            <i class="fa-solid fa-signal"></i>
+                        </div>
                         <div>
                             <h3><?= count($services) > 0 ? 'Live' : 'Draft' ?></h3>
                             <p>Catalog Status</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="admin-stat-card h-100">
-                        <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
-                        <div>
-                            <h3>24/7</h3>
-                            <p>Support Ready</p>
-                        </div>
-                    </div>
-                </div>
             </section>
+
+            <!-- ==================== Bookings & Add Service ==================== -->
+            <div class="admin-section-header">
+                <h5><i class="fa-solid fa-grid-2 me-1"></i> Management</h5>
+                <hr>
+            </div>
 
             <section class="row g-4">
                 <div class="col-12 col-xl-7">
                     <div class="admin-card h-100">
                         <div class="card-title">
                             <div>
-                                <h4>Recent Bookings</h4>
+                                <h4><i class="fa-solid fa-calendar-check me-2 text-muted"></i>Recent Bookings</h4>
                                 <p class="card-subtitle">Latest client requests at a glance</p>
                             </div>
-                            <span class="badge bg-primary">Live</span>
+                            <span class="badge bg-primary badge-count"><?= count($bookings) ?> New</span>
                         </div>
 
                         <?php if (!empty($bookings)) : ?>
@@ -458,26 +636,25 @@ if (isset($_POST['logout'])) {
                                                 <td><?= htmlspecialchars((string)($booking['address'] ?? '')) ?></td>
                                                 <td><?= htmlspecialchars((string)($booking['booking_date'] ?? '')) ?></td>
                                                 <td>
-    <form method="post" onsubmit="return confirm('Are you sure you want to delete this booking?');">
-        <input type="hidden" name="action" value="delete_booking">
-        <input type="hidden" name="booking_id" value="<?= (int)($booking['id'] ?? 0) ?>">
-
-        <button 
-            class="btn btn-sm btn-outline-danger"
-            type="submit"
-            title="Delete Booking"
-        >
-            <i class="fa-solid fa-trash"></i> Delete
-        </button>
-    </form>
-</td>
+                                                    <form method="post" onsubmit="return confirm('Are you sure you want to delete this booking?');">
+                                                        <input type="hidden" name="action" value="delete_booking">
+                                                        <input type="hidden" name="booking_id" value="<?= (int)($booking['id'] ?? 0) ?>">
+                                                        <button class="btn action-btn btn-outline-danger" type="submit" title="Delete Booking">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
                         <?php else : ?>
-                            <div class="empty-state">No bookings have been submitted yet.</div>
+                            <div class="empty-state">
+                                <div class="empty-state__icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+                                <p class="mb-1 fw-semibold">No bookings yet</p>
+                                <p class="mb-0 text-muted small">Bookings submitted by customers will appear here.</p>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -486,7 +663,7 @@ if (isset($_POST['logout'])) {
                     <div class="admin-card h-100">
                         <div class="card-title">
                             <div>
-                                <h4>Add New Service</h4>
+                                <h4><i class="fa-solid fa-plus-circle me-2 text-muted"></i>Add New Service</h4>
                                 <p class="card-subtitle">Create a polished service entry with imagery and pricing</p>
                             </div>
                         </div>
@@ -520,12 +697,19 @@ if (isset($_POST['logout'])) {
                 </div>
             </section>
 
+            <!-- ==================== Service Directory ==================== -->
+            <div class="admin-section-header">
+                <h5><i class="fa-solid fa-folder-open me-1"></i> Services</h5>
+                <hr>
+            </div>
+
             <section class="admin-card">
                 <div class="card-title">
                     <div>
-                        <h4>Service Directory</h4>
+                        <h4><i class="fa-solid fa-list-ul me-2 text-muted"></i>Service Directory</h4>
                         <p class="card-subtitle">Review, edit, and remove services from one workspace</p>
                     </div>
+                    <span class="badge bg-primary badge-count"><?= count($services) ?> Total</span>
                 </div>
 
                 <?php if (!empty($services)) : ?>
@@ -576,12 +760,11 @@ if ($imageFile !== '') {
                                         </td>
                                         <td>
                                             <div class="d-flex flex-wrap gap-2">
-                                                <a class="btn btn-sm btn-outline-primary" href="edit_service.php?id=<?= (int)$service['id'] ?>"><i class="fa-solid fa-pen"></i> Edit</a>
-                                                <form method="post" onsubmit="return confirm('Delete this service?');">
+                                                <a class="btn action-btn btn-outline-primary" href="edit_service.php?id=<?= (int)$service['id'] ?>" title="Edit Service"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                <form method="post" class="d-inline" onsubmit="return confirm('Delete this service?');">
                                                     <input type="hidden" name="action" value="delete_service">
                                                     <input type="hidden" name="service_id" value="<?= (int)$service['id'] ?>">
-                                                    <button class="btn btn-sm btn-outline-danger" type="submit"><i class="fa-solid fa-trash"></i> Delete</button>
-
+                                                    <button class="btn action-btn btn-outline-danger" type="submit" title="Delete Service"><i class="fa-solid fa-trash-can"></i></button>
                                                 </form>
                                             </div>
                                         </td>
@@ -591,9 +774,84 @@ if ($imageFile !== '') {
                         </table>
                     </div>
                 <?php else : ?>
-                    <div class="empty-state">No services found.</div>
+                    <div class="empty-state">
+                        <div class="empty-state__icon"><i class="fa-solid fa-list-check"></i></div>
+                        <p class="mb-1 fw-semibold">No services added yet</p>
+                        <p class="mb-0 text-muted small">Use the form above to add your first service entry.</p>
+                    </div>
                 <?php endif; ?>
             </section>
+
+            <!-- ==================== Contact Messages ==================== -->
+            <div class="admin-section-header">
+                <h5><i class="fa-solid fa-envelope me-1"></i> Communication</h5>
+                <hr>
+            </div>
+
+            <section class="admin-card">
+                <div class="card-title">
+                    <div>
+                        <h4><i class="fa-solid fa-inbox me-2 text-muted"></i>Contact Messages</h4>
+                        <p class="card-subtitle">Messages received from the contact form</p>
+                    </div>
+                    <span class="badge bg-primary badge-count">
+                        <?= count($contactMessages) ?> <?= count($contactMessages) === 1 ? 'Message' : 'Messages' ?>
+                    </span>
+                </div>
+
+                <?php if (!empty($contactMessages)) : ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle admin-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Subject</th>
+                                    <th>Message</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($contactMessages as $contact) : ?>
+                                    <tr>
+                                        <td><?= (int)($contact['id'] ?? 0) ?></td>
+                                        <td><?= htmlspecialchars(($contact['first_name'] ?? '') . ' ' . ($contact['last_name'] ?? '')) ?></td>
+                                        <td><a href="mailto:<?= htmlspecialchars((string)($contact['email'] ?? '')) ?>" class="text-decoration-none"><?= htmlspecialchars((string)($contact['email'] ?? '')) ?></a></td>
+                                        <td><?= htmlspecialchars((string)($contact['phone'] ?? '')) ?></td>
+                                        <td><span class="fw-semibold"><?= htmlspecialchars((string)($contact['subject'] ?? '')) ?></span></td>
+                                        <td><span class="text-muted" style="max-width: 200px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom;"><?= htmlspecialchars((string)($contact['message'] ?? '')) ?></span></td>
+                                        <td><small class="text-muted"><?= htmlspecialchars((string)($contact['created_at'] ?? '')) ?></small></td>
+                                        <td>
+                                            <form method="post" onsubmit="return confirm('Are you sure you want to delete this message?');">
+                                                <input type="hidden" name="action" value="delete_contact">
+                                                <input type="hidden" name="contact_id" value="<?= (int)($contact['id'] ?? 0) ?>">
+                                                <button class="btn action-btn btn-outline-danger" type="submit" title="Delete Message">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else : ?>
+                    <div class="empty-state">
+                        <div class="empty-state__icon"><i class="fa-solid fa-envelope-open"></i></div>
+                        <p class="mb-1 fw-semibold">No messages yet</p>
+                        <p class="mb-0 text-muted small">Contact form submissions will appear here.</p>
+                    </div>
+                <?php endif; ?>
+            </section>
+
+            <!-- ==================== Dashboard Footer ==================== -->
+            <footer class="admin-footer">
+                <i class="fa-solid fa-hands-helping me-1"></i>
+                &copy; <?= date('Y') ?> <a href="index.php">Quetta Services Hub</a> &mdash; Admin Dashboard. All rights reserved.
+            </footer>
         </main>
     </div>
 

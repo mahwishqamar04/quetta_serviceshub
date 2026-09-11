@@ -195,7 +195,7 @@ if ($conn) {
                         <?php foreach ($services as $service) : ?>
                             <div class="col-12 col-md-6 col-xl-4">
                                 <div class="card service-card h-100 border-0 shadow-sm fade-in-section">
-                                    <img src="images/<?= htmlspecialchars($service['image']) ?>" alt="<?= htmlspecialchars($service['name']) ?>" loading="lazy" decoding="async">
+                                    <img src="images/<?= htmlspecialchars($service['image']) ?>" alt="<?= htmlspecialchars($service['name']) ?>" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='images/hero-bg.jpg';">
                                     <div class="service-card__body">
                                         <h3 class="service-card__title"><?= htmlspecialchars($service['name']) ?></h3>
                                         <p class="service-card__text"><?= htmlspecialchars($service['description']) ?></p>
@@ -310,6 +310,33 @@ if ($conn) {
                             <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
                             <p class="mb-3">“The support team made everything easy, and the service was top quality.”</p>
                             <strong>Nida Baloch</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== AI Service Advisor Promo ==================== -->
+            <section class="ai-advisor-promo fade-in-section">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <span class="ai-advisor-promo__icon">
+                                <i class="fa-solid fa-robot"></i>
+                            </span>
+                            <span class="ai-advisor-promo__badge">Smart Recommendation</span>
+                        </div>
+                        <h3 class="ai-advisor-promo__title">Not Sure Which Service You Need?</h3>
+                        <p class="ai-advisor-promo__text">Describe your problem and let our AI Service Advisor recommend the right home service for you — fast, free, and available anytime.</p>
+                        <div class="d-flex flex-wrap gap-3 mt-2">
+                            <a href="ai_advisor.php" class="btn ai-advisor-promo__btn">
+                                <i class="fa-solid fa-robot"></i> Ask AI Service Advisor
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 d-none d-lg-block text-center">
+                        <div class="ai-advisor-promo__visual">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>AI-Powered</span>
                         </div>
                     </div>
                 </div>
