@@ -131,24 +131,225 @@ body {
     color: #6c757d;
 }
 
+/* Validation Error */
+
+.input-validation-error {
+    display: none;
+    color: #dc3545;
+    font-size: 0.82rem;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+.input-validation-error.visible {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.input-validation-error i {
+    font-size: 0.85rem;
+}
+
+.form-control.is-invalid-advisor {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+@keyframes advisorShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+}
+
+.advisor-shake {
+    animation: advisorShake 0.4s ease-in-out;
+}
+
+/* ================================
+   RECOMMENDATION CARD
+================================ */
+
+.advisor-recommend-card {
+    border: 1px solid #e5eaf0;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 10px;
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.advisor-card-image {
+    width: 100%;
+    max-height: 180px;
+    overflow: hidden;
+}
+
+.advisor-card-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.advisor-card-body {
+    padding: 16px 18px 18px;
+}
+
+.advisor-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(13,110,253,0.10), rgba(111,66,193,0.10));
+    color: #0d6efd;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.advisor-card-title {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0b1f3a;
+}
+
+.advisor-card-desc {
+    color: #58708e;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin: 0 0 12px;
+}
+
+.advisor-card-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f8fc;
+    border: 1px solid #e5eaf0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 0.92rem;
+    color: #0b1f3a;
+}
+
+.advisor-card-price i {
+    color: #0d6efd;
+}
+
+.advisor-book-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.18);
+}
+
+.advisor-book-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(13, 110, 253, 0.25);
+    color: #ffffff;
+}
+
+/* ================================
+   NO-MATCH SECTION
+================================ */
+
+.advisor-no-match {
+    margin-top: 6px;
+}
+
+.advisor-no-match > p:first-child {
+    color: #58708e;
+    font-size: 0.93rem;
+    line-height: 1.6;
+}
+
+.advisor-no-match-hint {
+    font-weight: 600;
+    color: #0b1f3a;
+    font-size: 0.88rem;
+    margin-bottom: 4px !important;
+}
+
+/* Tablet */
+
+@media (min-width: 577px) and (max-width: 991px) {
+    .ai-advisor-wrapper {
+        margin: 20px auto;
+    }
+
+    .ai-header {
+        padding: 22px 24px;
+    }
+
+    .chat-area {
+        min-height: 400px;
+        max-height: 450px;
+    }
+
+    .message-content {
+        max-width: 85%;
+    }
+}
+
 /* Mobile */
 
 @media (max-width: 576px) {
 
     .ai-advisor-wrapper {
-        margin: 10px;
+        margin: 10px 8px;
+        border-radius: 12px;
     }
 
     .ai-header {
-        padding: 20px;
+        padding: 18px 16px;
+    }
+
+    .ai-header h2 {
+        font-size: 1.15rem;
+    }
+
+    .ai-header p {
+        font-size: 0.88rem;
     }
 
     .chat-area {
         padding: 15px;
+        min-height: 320px;
+        max-height: 400px;
+    }
+
+    .message {
+        gap: 8px;
+    }
+
+    .message-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        font-size: 0.85rem;
     }
 
     .message-content {
-        max-width: 90%;
+        max-width: 92%;
+        padding: 12px 14px;
+    }
+
+    .message-content p {
+        font-size: 0.9rem;
     }
 
     .input-group {
@@ -156,8 +357,38 @@ body {
         gap: 10px;
     }
 
+    .advisor-input-area {
+        padding: 16px;
+    }
+
     .advisor-input-area .btn {
         width: 100%;
         height: 45px;
+    }
+
+    .advisor-card-image img {
+        height: 140px;
+    }
+
+    .advisor-card-body {
+        padding: 14px;
+    }
+
+    .advisor-card-title {
+        font-size: 1.05rem;
+    }
+
+    .advisor-book-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .example-btn {
+        font-size: 0.82rem;
+        padding: 6px 10px;
+    }
+
+    .example-problems {
+        gap: 6px;
     }
 }
